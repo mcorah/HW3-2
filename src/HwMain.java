@@ -19,16 +19,23 @@ public class HwMain {
 	public static void main(String[] args) throws Exception{
 		System.out.println("I hate java");
 		
-		//loading the file
+		// Options and java sttributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
 		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.csv";
+		int nInstance = 0;	// number of instances in the data set
+		int nAttribute = 0;	// number of attributes in the data set
+		int seed  = 4;		// chosen by fair dice roll, guaranteed to be random.
+		int folds = 10;		// number of folds in cross-validation
+		
+		//loading the file
 		BufferedReader br = new BufferedReader(new FileReader(pathFile));
 		String line;
-		int nInstance = 0;
+		//int nInstance = 0;
 		ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double> >();
 		String[] attributes = null;
 		while ((line = br.readLine()) != null) {
-			if (nInstance == 0) { //The first line is the name of attributes
+			if (nInstance == 0) { 
+				//The first line is the name of attributes
 				attributes = line.split(",");
 			} else {
 				String[] value = line.split(",");
@@ -41,7 +48,7 @@ public class HwMain {
 			nInstance++;
 		}
 		nInstance--; //This is the number of instance
-		int nAttribute = attributes.length;
+		nAttribute = attributes.length;
 		br.close();
 
 		//Print out the whole data file.
@@ -76,7 +83,7 @@ public class HwMain {
 		Attribute Attribute2 = new Attribute("YpositionHip");
 		Attribute Attribute3 = new Attribute("ZpositionHip");
 		//You should come up with any new feature
-		//For example, the size of this vector, sqrt(x^2+y^2+z^2), name it sumHip.
+		//For example, the size of this vector, sqrt(x^2 + y^2 + z^2), name it sumHip.
 		
 		//Declare the class attribute
 		//Declare a nominal attribute along with its value 
@@ -104,7 +111,7 @@ public class HwMain {
 		train.setClassIndex(3);
 		
 		//adding instances to training set
-		for(int i=0;i<nInstance;i++){
+		for(int i = 0; i < nInstance; i++){
 			//Create the instance (weka.core.Instance)
 			Instance temp = new Instance(4);
 			//setValue( Attribute, value)
@@ -125,19 +132,7 @@ public class HwMain {
 		//------Creating a classifier------//
 		System.out.println("The result of the classifier\n");
 
-		// loads data and set class index
-		//Instances data(train);
-		String clsIndex = Utils.getOption("c", args);
-		if (clsIndex.length() == 0)
-			clsIndex = "last";
-		if (clsIndex.equals("first"))
-			data.setClassIndex(0);
-		else if (clsIndex.equals("last"))
-			data.setClassIndex(data.numAttributes() - 1);
-		else
-			data.setClassIndex(Integer.parseInt(clsIndex) - 1);
-
-		// classifier
+		// Classifier
 		String[] tmpOptions;
 		String classname;
 		tmpOptions     = Utils.splitOptions(Utils.getOption("W", args));
@@ -145,18 +140,14 @@ public class HwMain {
 		tmpOptions[0]  = "";
 		Classifier cls = (Classifier) Utils.forName(Classifier.class, classname, tmpOptions);
 
-		// other options
-		int seed  = Integer.parseInt(Utils.getOption("s", args));
-		int folds = Integer.parseInt(Utils.getOption("x", args));
-
-		// randomize data
+		// Randomize data
 		Random rand = new Random(seed);
 		Instances randData = new Instances(data);
 		randData.randomize(rand);
 		if (randData.classAttribute().isNominal())
 			randData.stratify(folds);
 
-		// perform cross-validation
+		// Perform cross-validation
 		Evaluation eval = new Evaluation(randData);
 		for (int n = 0; n < folds; n++) {
 			Instances train = randData.trainCV(folds, n);
