@@ -1,6 +1,7 @@
 function plotFeature(feature, mask)
   labels = unique(mask)
   colors = 'rbgy';
+  figure();
   hold on
   for i=labels'
     data = feature(find(mask==i))
