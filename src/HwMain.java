@@ -17,7 +17,6 @@ import weka.classifiers.Evaluation;
 
 public class HwMain {
 	public static void main(String[] args) throws Exception{
-		System.out.println("I hate java");
 		
 		// Options and java sttributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
