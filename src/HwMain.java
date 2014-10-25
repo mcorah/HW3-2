@@ -20,19 +20,20 @@ public class HwMain {
 		System.out.println("I hate java");
 		
 		//loading the file
-		String pathFile ="/home/micah/courses/affective_computing/hw3-2/postureData.txt";
+		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
+		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.csv";
 		BufferedReader br = new BufferedReader(new FileReader(pathFile));
 		String line;
-		int nInstance =0;
+		int nInstance = 0;
 		ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double> >();
-		String[] attributes=null;
-		while ((line=br.readLine()) != null){
-			if(nInstance==0){	//The first line is the name of attributes
+		String[] attributes = null;
+		while ((line = br.readLine()) != null) {
+			if (nInstance == 0) { //The first line is the name of attributes
 				attributes = line.split(",");
-			}else{
+			} else {
 				String[] value = line.split(",");
 				ArrayList<Double> temp = new ArrayList<Double>();
-				for(int i=0;i<value.length;i++){
+				for (int i = 0; i < value.length; i++) {
 					temp.add(Double.parseDouble(value[i]));
 				}
 				data.add(temp);
@@ -42,17 +43,17 @@ public class HwMain {
 		nInstance--; //This is the number of instance
 		int nAttribute = attributes.length;
 		br.close();
-		
+
 		//Print out the whole data file.
-		System.out.println("Number of attributes: "+nAttribute);
-		System.out.println("Number of Instance: "+nInstance);
-		for(int i=0;i<nAttribute;i++){
-			System.out.print(attributes[i]+" ");
+		System.out.println("Number of attributes: " + nAttribute);
+		System.out.println("Number of Instance: " + nInstance);
+		for (int i = 0; i < nAttribute; i++) {
+			System.out.print(attributes[i] + " ");
 		}
 		System.out.print("\n");
-		for(int i=0;i<nInstance;i++){
-			for(int j=0;j<nAttribute;j++){
-				System.out.print((data.get(i)).get(j)+" ");
+		for (int i = 0; i < nInstance; i++) {
+			for (int j = 0; j < nAttribute; j++) {
+				System.out.print((data.get(i)).get(j) + " ");
 			}
 			System.out.print("\n");
 		}
