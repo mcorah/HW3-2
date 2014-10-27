@@ -52,7 +52,7 @@ public class HwMain {
 		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
 
 		Instances data_features;
-		data_features = data;//generateFeatures(data);
+		data_features = generateFeatures(data);
 		if (data_features.classIndex() == -1)
 			   data_features.setClassIndex(data_features.numAttributes() - 1);
 		// Randomize data
