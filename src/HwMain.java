@@ -51,13 +51,11 @@ public class HwMain {
 		//tmpOptions[0]  = "";
 		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
 
-		Instances data_features;
-		data_features = generateFeatures(data);
-		if (data_features.classIndex() == -1)
-			   data_features.setClassIndex(data_features.numAttributes() - 1);
+		if (data.classIndex() == -1)
+			   data.setClassIndex(data.numAttributes() - 1);
 		// Randomize data
 		Random rand = new Random(seed);
-		Instances randData = new Instances(data_features);
+		Instances randData = new Instances(data);
 		randData.randomize(rand);
 		if (randData.classAttribute().isNominal())
 			randData.stratify(folds);
@@ -67,6 +65,27 @@ public class HwMain {
 		for (int n = 0; n < folds; n++) {
 			Instances train = randData.trainCV(folds, n);
 			Instances test = randData.testCV(folds, n);
+			
+			train = generateFeatures(train);
+			if (train.classIndex() == -1)
+				   train.setClassIndex(train.numAttributes() - 1);
+			test = generateFeatures(test);
+			if (test.classIndex() == -1)
+				   test.setClassIndex(test.numAttributes() - 1);
+			
+			AttributeSelection selection = new AttributeSelection();
+			CfsSubsetEval subs = new CfsSubsetEval();
+			GreedyStepwise search = new GreedyStepwise();
+			search.setSearchBackwards(true);
+			selection.setEvaluator(subs);
+			selection.setSearch(search);
+			selection.setInputFormat(train);
+			// generate new data
+			train = Filter.useFilter(train, selection);
+			
+			System.out.println("feature selection");
+			System.out.println(train.toSummaryString());
+			System.out.print("\n");
 			// the above code is used by the StratifiedRemoveFolds filter, the
 			// code below by the Explorer/Experimenter:
 			// Instances train = randData.trainCV(folds, n, rand);
@@ -92,9 +111,23 @@ public class HwMain {
 	}
 	
 	public static Instances generateFeatures(Instances data) throws Exception{
-		SimpleBatchFilter filter = new QuaternionFilter();
-		filter.setInputFormat(data);
-		Instances new_data = Filter.useFilter(data,  filter);
+		SimpleBatchFilter filter;
+		Instances new_data = new Instances(data);
+		
+		filter = new SimilarFilter();
+		filter.setInputFormat(new_data);
+		//new_data = Filter.useFilter(new_data,  filter);
+		
+		filter = new QuaternionFilter();
+		filter.setInputFormat(new_data);
+		//new_data = Filter.useFilter(new_data,  filter);
+		
+		filter = new PropagateFilter();
+		filter.setInputFormat(new_data);
+		//new_data = Filter.useFilter(new_data,  filter);
+		
+
+		
 		System.out.println("num_instances");
 		System.out.println(new_data.numInstances());
 		return new_data;
