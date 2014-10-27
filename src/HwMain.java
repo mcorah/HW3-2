@@ -47,13 +47,17 @@ public class HwMain {
 		String[] tmpOptions;
 		String classname;
 		tmpOptions     = Utils.splitOptions(Utils.getOption("W", args));
-		classname      = tmpOptions[0];
-		tmpOptions[0]  = "";
-		Classifier cls = (Classifier) Utils.forName(Classifier.class, classname, tmpOptions);
+		classname      = "functions.MultilayerPerceptron";// tmpOptions[0];
+		//tmpOptions[0]  = "";
+		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
 
+		Instances data_features;
+		data_features = data;//generateFeatures(data);
+		if (data_features.classIndex() == -1)
+			   data_features.setClassIndex(data_features.numAttributes() - 1);
 		// Randomize data
 		Random rand = new Random(seed);
-		Instances randData = new Instances(data);
+		Instances randData = new Instances(data_features);
 		randData.randomize(rand);
 		if (randData.classAttribute().isNominal())
 			randData.stratify(folds);
@@ -82,5 +86,17 @@ public class HwMain {
 		System.out.println("Seed: " + seed);
 		System.out.println();
 		System.out.println(eval.toSummaryString("=== " + folds + "-fold Cross-validation ===", false));
+		System.out.println();
+		System.out.println("== Confusion ==");
+		System.out.println(eval.toMatrixString());
+	}
+	
+	public static Instances generateFeatures(Instances data) throws Exception{
+		SimpleBatchFilter filter = new QuaternionFilter();
+		filter.setInputFormat(data);
+		Instances new_data = Filter.useFilter(data,  filter);
+		System.out.println("num_instances");
+		System.out.println(new_data.numInstances());
+		return new_data;
 	}
 }
