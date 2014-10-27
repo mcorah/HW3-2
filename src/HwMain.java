@@ -16,7 +16,9 @@ import weka.classifiers.functions.*;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.filters.Filter;
+import weka.attributeSelection.*;
+import weka.filters.*;
+import weka.filters.supervised.attribute.AttributeSelection;
 
 public class HwMain {
 	public static void main(String[] args) throws Exception{
@@ -74,12 +76,21 @@ public class HwMain {
 				   test.setClassIndex(test.numAttributes() - 1);
 			
 			AttributeSelection selection = new AttributeSelection();
-			CfsSubsetEval subs = new CfsSubsetEval();
-			GreedyStepwise search = new GreedyStepwise();
-			search.setSearchBackwards(true);
+			//CfsSubsetEval subs = new CfsSubsetEval();
+			//FilteredSubsetEval subs = new FilteredSubsetEval();
+			GainRatioAttributeEval subs = new GainRatioAttributeEval();
+			
+			//GreedyStepwise search = new GreedyStepwise();
+			//search.setSearchBackwards(true);
+			Ranker search = new Ranker();
+			
+			search.setNumToSelect(50);
+			
 			selection.setEvaluator(subs);
 			selection.setSearch(search);
 			selection.setInputFormat(train);
+			System.out.print("what it thinks: ");
+			System.out.println(search.getCalculatedNumToSelect());
 			// generate new data
 			train = Filter.useFilter(train, selection);
 			
@@ -120,7 +131,7 @@ public class HwMain {
 		
 		filter = new QuaternionFilter();
 		filter.setInputFormat(new_data);
-		//new_data = Filter.useFilter(new_data,  filter);
+		new_data = Filter.useFilter(new_data,  filter);
 		
 		filter = new PropagateFilter();
 		filter.setInputFormat(new_data);
