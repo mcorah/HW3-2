@@ -19,28 +19,20 @@ public class HwMain {
 	public static void main(String[] args) throws Exception{
 		System.out.println("I hate java");
 		
-		// Options and java sttributes
-		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
-		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.csv";
-		int nInstance = 0;	// number of instances in the data set
-		int nAttribute = 0;	// number of attributes in the data set
-		int seed  = 4;		// chosen by fair dice roll, guaranteed to be random.
-		int folds = 10;		// number of folds in cross-validation
-		
 		//loading the file
+		String pathFile ="/home/andrew/affectiveComputing/HW3-2/postureData.csv";
 		BufferedReader br = new BufferedReader(new FileReader(pathFile));
 		String line;
-		//int nInstance = 0;
+		int nInstance =0;
 		ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double> >();
-		String[] attributes = null;
-		while ((line = br.readLine()) != null) {
-			if (nInstance == 0) { 
-				//The first line is the name of attributes
+		String[] attributes=null;
+		while ((line=br.readLine()) != null){
+			if(nInstance==0){	//The first line is the name of attributes
 				attributes = line.split(",");
-			} else {
+			}else{
 				String[] value = line.split(",");
 				ArrayList<Double> temp = new ArrayList<Double>();
-				for (int i = 0; i < value.length; i++) {
+				for(int i=0;i<value.length;i++){
 					temp.add(Double.parseDouble(value[i]));
 				}
 				data.add(temp);
@@ -48,19 +40,19 @@ public class HwMain {
 			nInstance++;
 		}
 		nInstance--; //This is the number of instance
-		nAttribute = attributes.length;
+		int nAttribute = attributes.length;
 		br.close();
-
+		
 		//Print out the whole data file.
-		System.out.println("Number of attributes: " + nAttribute);
-		System.out.println("Number of Instance: " + nInstance);
-		for (int i = 0; i < nAttribute; i++) {
-			System.out.print(attributes[i] + " ");
+		System.out.println("Number of attributes: "+nAttribute);
+		System.out.println("Number of Instance: "+nInstance);
+		for(int i=0;i<nAttribute;i++){
+			System.out.print(attributes[i]+" ");
 		}
 		System.out.print("\n");
-		for (int i = 0; i < nInstance; i++) {
-			for (int j = 0; j < nAttribute; j++) {
-				System.out.print((data.get(i)).get(j) + " ");
+		for(int i=0;i<nInstance;i++){
+			for(int j=0;j<nAttribute;j++){
+				System.out.print((data.get(i)).get(j)+" ");
 			}
 			System.out.print("\n");
 		}
@@ -78,12 +70,25 @@ public class HwMain {
 		
 		//---Building features in weka format---//
 		
+		//Features suggested by weka
+		//26,31,33,34,43,46,47,48
+		//XrotationChest ZrotationLeftShoulder YrotationLeftShoulder ZrotationLeftElbow 
+		//ZrotationRightShoulder ZrotationRightElbow XrotationRightElbow rotationRightElbow
+		
+		
 		//Declare numeric attributes (weka.core.Attribute)
-		Attribute Attribute1 = new Attribute("XpositionHip");
-		Attribute Attribute2 = new Attribute("YpositionHip");
-		Attribute Attribute3 = new Attribute("ZpositionHip");
+		Attribute Attribute26 = new Attribute("XrotationChest");
+		Attribute Attribute31 = new Attribute("ZrotationLeftShoulder");
+		Attribute Attribute33 = new Attribute("YrotationLeftShoulder");
+		Attribute Attribute34 = new Attribute("ZrotationLeftElbow");
+		
+		Attribute Attribute43 = new Attribute("ZrotationRightShoulder");
+		Attribute Attribute46 = new Attribute("ZrotationRightElbow");
+		Attribute Attribute47 = new Attribute("XrotationRightElbow");
+		Attribute Attribute48 = new Attribute("rotationRightElbow");
+		
 		//You should come up with any new feature
-		//For example, the size of this vector, sqrt(x^2 + y^2 + z^2), name it sumHip.
+		//For example, the size of this vector, sqrt(x^2+y^2+z^2), name it sumHip.
 		
 		//Declare the class attribute
 		//Declare a nominal attribute along with its value 
@@ -98,9 +103,15 @@ public class HwMain {
 		
 		//Declare the feature vector
 		FastVector fvWekaAttributes = new FastVector(4);
-		fvWekaAttributes.addElement(Attribute1);
-		fvWekaAttributes.addElement(Attribute2);
-		fvWekaAttributes.addElement(Attribute3);
+		fvWekaAttributes.addElement(Attribute26);
+		fvWekaAttributes.addElement(Attribute31);
+		fvWekaAttributes.addElement(Attribute33);
+		fvWekaAttributes.addElement(Attribute34);
+		
+		fvWekaAttributes.addElement(Attribute43);
+		fvWekaAttributes.addElement(Attribute46);
+		fvWekaAttributes.addElement(Attribute47);
+		fvWekaAttributes.addElement(Attribute48);
 		fvWekaAttributes.addElement(ClassAttribute);
 		
 		//Create an empty training set (weka.core.Instances)
@@ -108,19 +119,26 @@ public class HwMain {
 		Instances train = new Instances("Posture",fvWekaAttributes,nInstance);
 		//set class index (the thing that we want to predict)
 		//index starts at 0.
-		train.setClassIndex(3);
+		train.setClassIndex(8);
 		
 		//adding instances to training set
-		for(int i = 0; i < nInstance; i++){
+		for(int i=0;i<nInstance;i++){
 			//Create the instance (weka.core.Instance)
-			Instance temp = new Instance(4);
+			Instance temp = new Instance(9);
 			//setValue( Attribute, value)
-			temp.setValue( (Attribute)fvWekaAttributes.elementAt(0), data.get(i).get(0) );
-			temp.setValue( (Attribute)fvWekaAttributes.elementAt(1), data.get(i).get(1) );
-			temp.setValue( (Attribute)fvWekaAttributes.elementAt(2), data.get(i).get(2) );
+			
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(0), data.get(i).get(25) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(1), data.get(i).get(30) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(2), data.get(i).get(32) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(3), data.get(i).get(33) );
+			
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(4), data.get(i).get(42) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(5), data.get(i).get(45) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(6), data.get(i).get(46) );
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(7), data.get(i).get(47) );
 			 
 			int classValue = (data.get(i).get(nAttribute-1)).intValue();
-			temp.setValue( (Attribute)fvWekaAttributes.elementAt(3), 
+			temp.setValue( (Attribute)fvWekaAttributes.elementAt(8), 
 					Integer.toString( classValue ) );
 			//add the instance
 			//classValue when print out is shown as index,not the value
@@ -131,45 +149,79 @@ public class HwMain {
 		
 		//------Creating a classifier------//
 		System.out.println("The result of the classifier\n");
-
-		// Classifier
-		String[] tmpOptions;
-		String classname;
-		tmpOptions     = Utils.splitOptions(Utils.getOption("W", args));
-		classname      = tmpOptions[0];
-		tmpOptions[0]  = "";
-		Classifier cls = (Classifier) Utils.forName(Classifier.class, classname, tmpOptions);
-
-		// Randomize data
-		Random rand = new Random(seed);
-		Instances randData = new Instances(data);
-		randData.randomize(rand);
-		if (randData.classAttribute().isNominal())
-			randData.stratify(folds);
-
-		// Perform cross-validation
-		Evaluation eval = new Evaluation(randData);
-		for (int n = 0; n < folds; n++) {
-			Instances train = randData.trainCV(folds, n);
-			Instances test = randData.testCV(folds, n);
-			// the above code is used by the StratifiedRemoveFolds filter, the
-			// code below by the Explorer/Experimenter:
-			// Instances train = randData.trainCV(folds, n, rand);
-
-			// build and evaluate classifier
-			Classifier clsCopy = Classifier.makeCopy(cls);
-			clsCopy.buildClassifier(train);
-			eval.evaluateModel(clsCopy, test);
+		
+		//Create a ZeroR classifier (weka.classifiers.rules.ZeroR)
+		ZeroR zeror = new ZeroR();
+		//Evaluation with 10 fold cv
+		Evaluation eval = new Evaluation(train);
+		//supply, the classifier, training data, number of folds, random seed
+		eval.crossValidateModel(zeror, train, 10, new Random(1));
+		//output summary
+		System.out.println("ZeroR's output summary ="+eval.toSummaryString());
+		//confusion matrix
+		System.out.println("ZeroR's Error = "+eval.pctIncorrect());
+		System.out.println(eval.toMatrixString());
+		//output the percentage of incorrect
+		
+		//Na�ve bayes (weka.classifiers.bayes.NaiveBayes
+		NaiveBayes nb = new NaiveBayes();
+		//Create a new Evaluation every time
+		eval = new Evaluation(train);
+		eval.crossValidateModel(nb,train,10,new Random(1));
+		System.out.println("NaiveBayes' Error = "+eval.pctIncorrect());
+		System.out.println(eval.toMatrixString());
+		
+		//J48 (weka.classifiers.trees.J48)
+		J48 j48 = new J48();
+		eval = new Evaluation(train);
+		eval.crossValidateModel(j48,train,10, new Random(1));
+		System.out.println("J48's Error = "+eval.pctIncorrect());
+		
+		//set up options for classifier
+		String[] options = new String[4];
+		options[0] = "-C";
+		options[1] = "0.01"; // default value is 0.25
+		options[2] = "-M";
+		options[3] = "2";
+		j48.setOptions(options); //set the options
+		j48.buildClassifier(train); //build classifier
+		
+		eval = new Evaluation(train);
+		eval.crossValidateModel(j48,train,10, new Random(1));
+		System.out.println("J48 (with option)'s Error = "+eval.pctIncorrect());
+		
+		//KNN (or IBk) (weka.classifiers.lazy.IBk)
+		IBk ibk = new IBk();
+		for(int k=1;k<=10;k++){
+			options = new String[2];
+			options[0] = "-K";
+			options[1] = ""+k;
+			ibk.setOptions(options);
+			eval = new Evaluation(train);
+			eval.crossValidateModel(ibk,train,10, new Random(1));
+			System.out.println("IBk (k="+k +")'s Error = "+eval.pctIncorrect());
 		}
-
-		// output evaluation
-		System.out.println();
-		System.out.println("=== Setup ===");
-		System.out.println("Classifier: " + cls.getClass().getName() + " " + Utils.joinOptions(cls.getOptions()));
-		System.out.println("Dataset: " + data.relationName());
-		System.out.println("Folds: " + folds);
-		System.out.println("Seed: " + seed);
-		System.out.println();
-		System.out.println(eval.toSummaryString("=== " + folds + "-fold Cross-validation ===", false));
+		
+		//Multilayer Perceptron (weka.classifiers.functions.MultilayerPerceptron)
+		MultilayerPerceptron mp = new MultilayerPerceptron();
+		options = new String[14];
+		options[0] = "-L";  //Learning Rate
+        options[1] = "0.3"; 
+        options[2] = "-M";  //Momentum
+        options[3] = "0.2";
+        options[4] = "-N";  //Training time
+        options[5] = "500";
+        options[6] = "-V";  //percentage size of validation set
+        options[7] = "0"; 
+        options[8] = "-S";  //seed
+        options[9] = "0";
+        options[10] = "-E"; //threshold for number of consequetive errors
+        options[11] = "20";
+        options[12] = "-H"; //Hidden layer 
+        options[13] = "a";  // a =(attribs+classes)/2
+		mp.setOptions(options);
+		eval = new Evaluation(train);
+		eval.crossValidateModel(mp,train,10, new Random(1));
+		System.out.println("MP's Error = "+eval.pctIncorrect());
 	}
 }
