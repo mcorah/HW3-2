@@ -1,34 +1,23 @@
 package src;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Random;
 
-import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.FastVector;
-import weka.core.Attribute;
 import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
-import weka.classifiers.trees.*;
-import weka.classifiers.rules.*;
-import weka.classifiers.bayes.*;
-import weka.classifiers.functions.*;
-import weka.classifiers.lazy.IBk;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.attributeSelection.*;
 import weka.filters.*;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.unsupervised.attribute.*;
-import weka.filters.supervised.attribute.*;
 
 public class HwMain {
 	public static void main(String[] args) throws Exception {
+		
 		// Options and java attributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.arff";
-		//pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
+		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
 		//int seed = 4; // chosen by fair dice roll, guaranteed to be random.
 		int folds = 10; // number of folds in cross-validation
 
@@ -40,20 +29,16 @@ public class HwMain {
 		if (data.classIndex() == -1)
 			data.setClassIndex(data.numAttributes() - 1);
 
-		// Print the data set USING THE WEKA API THAT ALREADY DOES THE WORK
-		// FOR YOU WHY WOULD YOU DO IT ANY OTHER WAY !?
+		// Print the data set using the Weka API
 		System.out.println(data.toSummaryString());
 		System.out.print("\n");
-
-		// ------Creating a classifier------//
-		System.out.println("Classifying and validating using 10-fold CV\n");
 
 		// Classifier
 		String[] tmpOptions = {};//{"-N", "100", "-M", "0.1", "-L", "0.2", "-B", "-H", "70,20,20,20,10"};
 		//String[] tmpOptions = {"-H", "70,20,20,20"};
 		String classname;
-		//classname      = "bayes.NaiveBayes";
-		classname      = "functions.MultilayerPerceptron";
+		classname      = "bayes.NaiveBayes";
+		//classname      = "functions.MultilayerPerceptron";
 		//classname      = "meta.RandomCommittee";
 		//classname      = "functions.SMO";
 		//classname      = "trees.J48";
@@ -63,6 +48,7 @@ public class HwMain {
 
 		if (data.classIndex() == -1)
 			data.setClassIndex(data.numAttributes() - 1);
+		
 		// Randomize data
 		Random rand = new Random();
 		Instances randData = new Instances(data);
@@ -77,13 +63,12 @@ public class HwMain {
 			// Useful
 			System.out.println("=== Fold " + (n + 1) + " of " + folds + " ===");
 			
+			// Generate features in a training set and a testing set
 			Instances train = randData.trainCV(folds, n);
-			Instances test = randData.testCV(folds, n);
-
 			train = generateFeatures(train);
 			if (train.classIndex() == -1)
 				train.setClassIndex(train.numAttributes() - 1);
-			
+			Instances test = randData.testCV(folds, n);
 			test = generateFeatures(test);
 			if (test.classIndex() == -1)
 				test.setClassIndex(test.numAttributes() - 1);
@@ -106,13 +91,13 @@ public class HwMain {
 			// code below by the Explorer/Experimenter:
 			// Instances train = randData.trainCV(folds, n, rand);
 
-			// build and evaluate classifier
+			// Build and evaluate classifier
 			Classifier clsCopy = Classifier.makeCopy(cls);
 			clsCopy.buildClassifier(train);
 			eval.evaluateModel(clsCopy, test);
 		}
 
-		// output evaluation
+		// Print the results
 		System.out.println();
 		System.out.println("=== Setup ===");
 		System.out.println("Classifier: " + cls.getClass().getName() + " "
