@@ -16,8 +16,10 @@ public class HwMain {
 	public static void main(String[] args) throws Exception {
 		
 		// Options and java attributes
-		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.arff";
+		String pathFile;
+		//pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.arff";
 		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
+		//pathFile = "/home/andrew/affectiveComputing/HW3-2/postureData.arff";
 		//int seed = 4; // chosen by fair dice roll, guaranteed to be random.
 		int folds = 10; // number of folds in cross-validation
 
@@ -117,10 +119,13 @@ public class HwMain {
 		SimpleBatchFilter filter;
 		Instances new_data = new Instances(data);
 
+		DifferenceGenerator diffGen = new DifferenceGenerator();
+		//new_data = diffGen.process(new_data);
+		
 		filter = new SimilarFilter();
 		filter.setInputFormat(new_data);
 		// new_data = Filter.useFilter(new_data, filter);
-
+		
 		filter = new QuaternionFilter();
 		filter.setInputFormat(new_data);
 		//new_data = Filter.useFilter(new_data,  filter);
