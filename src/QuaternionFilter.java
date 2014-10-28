@@ -24,18 +24,33 @@ public class QuaternionFilter extends SimpleBatchFilter{
 		for(int i=0; i < 3; ++i){
 			list.addElement(inputFormat.attribute(i));
 		}
+		int done = -1;
 		for(int i=1; i < (inputFormat.numAttributes()-1)/3; ++i){
 			String name = inputFormat.attribute((i*3)).name();
 			name = name.substring(1);
-			Attribute a = new Attribute("a"+name);
-			Attribute b = new Attribute("b"+name);
-			Attribute c = new Attribute("c"+name);
-			Attribute d = new Attribute("d"+name);
-			list.addElement(a);
-			list.addElement(b);
-			list.addElement(c);
-			list.addElement(d);
+			if(done == -1){
+				if(name.contains("_")){
+					done = 3*i;
+					break;
+				} else {
+					Attribute a = new Attribute("a"+name);
+					Attribute b = new Attribute("b"+name);
+					Attribute c = new Attribute("c"+name);
+					Attribute d = new Attribute("d"+name);
+					list.addElement(a);
+					list.addElement(b);
+					list.addElement(c);
+					list.addElement(d);
+				}
+			}
 		}
+		
+		if(done>0){
+			for (int i=done; i<inputFormat.numAttributes(); ++i){
+				list.addElement(inputFormat.attribute(i));
+			}
+		}
+		
 		list.addElement(inputFormat.attribute(inputFormat.numAttributes()-1));
 		System.out.println(list.size());
 		//System.out.println(list.capacity()-inputFormat.numAttributes());
@@ -71,7 +86,7 @@ public class QuaternionFilter extends SimpleBatchFilter{
 			}
 			values[values.length-1] = inst.instance(i).value(inst.instance(i).numAttributes()-1);
 			result.add(new Instance(1, values));
-			result.add(new Instance(1, Quaternion.negate(values)));
+			//result.add(new Instance(1, Quaternion.negate(values)));
 		}
 		if (result.classIndex() == -1)
 			result.setClassIndex(result.numAttributes() - 1);
