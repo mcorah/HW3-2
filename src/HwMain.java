@@ -27,7 +27,7 @@ public class HwMain {
 		// Options and java attributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.arff";
 		//pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
-		int seed = 4; // chosen by fair dice roll, guaranteed to be random.
+		//int seed = 4; // chosen by fair dice roll, guaranteed to be random.
 		int folds = 10; // number of folds in cross-validation
 
 		// Load data set from file using the recommended method for
@@ -56,12 +56,13 @@ public class HwMain {
 		//classname      = "functions.SMO";
 		//classname      = "trees.J48";
 		//classname      = "trees.RandomForest";
-		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
+		Classifier cls = (Classifier) Utils.forName(Classifier.class,
+				"weka.classifiers." + classname, tmpOptions);
 
 		if (data.classIndex() == -1)
 			data.setClassIndex(data.numAttributes() - 1);
 		// Randomize data
-		Random rand = new Random(seed);
+		Random rand = new Random();
 		Instances randData = new Instances(data);
 		randData.randomize(rand);
 		if (randData.classAttribute().isNominal())
@@ -70,6 +71,10 @@ public class HwMain {
 		// Perform cross-validation
 		Evaluation eval = new Evaluation(randData);
 		for (int n = 0; n < folds; n++) {
+			
+			// Useful
+			System.out.println("=== Fold " + (n + 1) + " of " + folds + " ===");
+			
 			Instances train = randData.trainCV(folds, n);
 			Instances test = randData.testCV(folds, n);
 
@@ -112,7 +117,7 @@ public class HwMain {
 				+ Utils.joinOptions(cls.getOptions()));
 		System.out.println("Dataset: " + data.relationName());
 		System.out.println("Folds: " + folds);
-		System.out.println("Seed: " + seed);
+		//System.out.println("Seed: " + seed);
 		System.out.println();
 		System.out.println(eval.toSummaryString("=== " + folds
 				+ "-fold Cross-validation ===", false));
