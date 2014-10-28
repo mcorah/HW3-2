@@ -1,3 +1,5 @@
+package src;
+
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
