@@ -93,11 +93,9 @@ public class HwMain {
 			selection.setInputFormat(train);
 			System.out.print("what it thinks: ");
 			System.out.println(search.getCalculatedNumToSelect());
-			// generate new data
-			train = Filter.useFilter(train, selection);
 
 			System.out.println("feature selection");
-			System.out.println(train.toSummaryString());
+			System.out.println(Filter.useFilter(train, selection).toSummaryString());
 			System.out.print("\n");
 			// the above code is used by the StratifiedRemoveFolds filter, the
 			// code below by the Explorer/Experimenter:
