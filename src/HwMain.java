@@ -1,3 +1,5 @@
+package src;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -21,40 +23,40 @@ import weka.filters.*;
 import weka.filters.supervised.attribute.AttributeSelection;
 
 public class HwMain {
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
 		// Options and java attributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
 		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
-		int seed  = 4;		// chosen by fair dice roll, guaranteed to be random.
-		int folds = 10;		// number of folds in cross-validation
-		
-		// Load data set from file using the recommended method for 
-		//   ARFF files in Weka > 3.5.5. For details refer to:
-		//   http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+		int seed = 4; // chosen by fair dice roll, guaranteed to be random.
+		int folds = 10; // number of folds in cross-validation
+
+		// Load data set from file using the recommended method for
+		// ARFF files in Weka > 3.5.5. For details refer to:
+		// http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
 		DataSource source = new DataSource(pathFile);
 		Instances data = source.getDataSet();
 		if (data.classIndex() == -1)
-		   data.setClassIndex(data.numAttributes() - 1);
-		
+			data.setClassIndex(data.numAttributes() - 1);
+
 		// Print the data set USING THE WEKA API THAT ALREADY DOES THE WORK
-		//  FOR YOU WHY WOULD YOU DO IT ANY OTHER WAY !?
+		// FOR YOU WHY WOULD YOU DO IT ANY OTHER WAY !?
 		System.out.println(data.toSummaryString());
 		System.out.print("\n");
-		
-		
-		//------Creating a classifier------//
+
+		// ------Creating a classifier------//
 		System.out.println("Classifying and validating using 10-fold CV\n");
 
 		// Classifier
 		String[] tmpOptions;
 		String classname;
-		tmpOptions     = Utils.splitOptions(Utils.getOption("W", args));
-		classname      = "functions.MultilayerPerceptron";// tmpOptions[0];
-		//tmpOptions[0]  = "";
-		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
+		tmpOptions = Utils.splitOptions(Utils.getOption("W", args));
+		classname = "functions.MultilayerPerceptron";// tmpOptions[0];
+		// tmpOptions[0] = "";
+		Classifier cls = (Classifier) Utils.forName(Classifier.class,
+				"weka.classifiers." + classname, tmpOptions);
 
 		if (data.classIndex() == -1)
-			   data.setClassIndex(data.numAttributes() - 1);
+			data.setClassIndex(data.numAttributes() - 1);
 		// Randomize data
 		Random rand = new Random(seed);
 		Instances randData = new Instances(data);
@@ -67,35 +69,33 @@ public class HwMain {
 		for (int n = 0; n < folds; n++) {
 			Instances train = randData.trainCV(folds, n);
 			Instances test = randData.testCV(folds, n);
-			
+
 			train = generateFeatures(train);
 			if (train.classIndex() == -1)
-				   train.setClassIndex(train.numAttributes() - 1);
+				train.setClassIndex(train.numAttributes() - 1);
 			test = generateFeatures(test);
 			if (test.classIndex() == -1)
-				   test.setClassIndex(test.numAttributes() - 1);
-			
+				test.setClassIndex(test.numAttributes() - 1);
+
 			AttributeSelection selection = new AttributeSelection();
-			//CfsSubsetEval subs = new CfsSubsetEval();
-			//FilteredSubsetEval subs = new FilteredSubsetEval();
+			// CfsSubsetEval subs = new CfsSubsetEval();
+			// FilteredSubsetEval subs = new FilteredSubsetEval();
 			GainRatioAttributeEval subs = new GainRatioAttributeEval();
-			
-			//GreedyStepwise search = new GreedyStepwise();
-			//search.setSearchBackwards(true);
+
+			// GreedyStepwise search = new GreedyStepwise();
+			// search.setSearchBackwards(true);
 			Ranker search = new Ranker();
-			
+
 			search.setNumToSelect(50);
-			
+
 			selection.setEvaluator(subs);
 			selection.setSearch(search);
 			selection.setInputFormat(train);
 			System.out.print("what it thinks: ");
 			System.out.println(search.getCalculatedNumToSelect());
-			// generate new data
-			train = Filter.useFilter(train, selection);
-			
+
 			System.out.println("feature selection");
-			System.out.println(train.toSummaryString());
+			System.out.println(Filter.useFilter(train, selection).toSummaryString());
 			System.out.print("\n");
 			// the above code is used by the StratifiedRemoveFolds filter, the
 			// code below by the Explorer/Experimenter:
@@ -110,35 +110,35 @@ public class HwMain {
 		// output evaluation
 		System.out.println();
 		System.out.println("=== Setup ===");
-		System.out.println("Classifier: " + cls.getClass().getName() + " " + Utils.joinOptions(cls.getOptions()));
+		System.out.println("Classifier: " + cls.getClass().getName() + " "
+				+ Utils.joinOptions(cls.getOptions()));
 		System.out.println("Dataset: " + data.relationName());
 		System.out.println("Folds: " + folds);
 		System.out.println("Seed: " + seed);
 		System.out.println();
-		System.out.println(eval.toSummaryString("=== " + folds + "-fold Cross-validation ===", false));
+		System.out.println(eval.toSummaryString("=== " + folds
+				+ "-fold Cross-validation ===", false));
 		System.out.println();
 		System.out.println("== Confusion ==");
 		System.out.println(eval.toMatrixString());
 	}
-	
-	public static Instances generateFeatures(Instances data) throws Exception{
+
+	public static Instances generateFeatures(Instances data) throws Exception {
 		SimpleBatchFilter filter;
 		Instances new_data = new Instances(data);
-		
+
 		filter = new SimilarFilter();
 		filter.setInputFormat(new_data);
-		//new_data = Filter.useFilter(new_data,  filter);
-		
+		// new_data = Filter.useFilter(new_data, filter);
+
 		filter = new QuaternionFilter();
 		filter.setInputFormat(new_data);
-		new_data = Filter.useFilter(new_data,  filter);
-		
+		new_data = Filter.useFilter(new_data, filter);
+
 		filter = new PropagateFilter();
 		filter.setInputFormat(new_data);
-		//new_data = Filter.useFilter(new_data,  filter);
-		
+		// new_data = Filter.useFilter(new_data, filter);
 
-		
 		System.out.println("num_instances");
 		System.out.println(new_data.numInstances());
 		return new_data;

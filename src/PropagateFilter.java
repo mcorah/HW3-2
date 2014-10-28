@@ -1,3 +1,5 @@
+package src;
+
 import weka.core.Capabilities;
 import weka.core.Instances;
 import weka.core.Capabilities.Capability;
@@ -20,7 +22,9 @@ public class PropagateFilter extends SimpleBatchFilter {
 	protected Instances determineOutputFormat(Instances inputFormat) {
 		Instances result = new Instances(inputFormat);
 		for (int i = 0; i < angle_propagation.length; ++i) {
-			result = Quaternion.insertQuat(result, angle_propagation[i][angle_propagation[i].length - 1] + "Prop");
+			result = Quaternion.insertQuat(result,
+					angle_propagation[i][angle_propagation[i].length - 1]
+							+ "Prop");
 		}
 		return result;
 	}
@@ -29,14 +33,17 @@ public class PropagateFilter extends SimpleBatchFilter {
 		Instances result = new Instances(determineOutputFormat(inst));
 		for (int i = 0; i < inst.numInstances(); ++i) {
 			for (int j = 0; j < angle_propagation.length; ++j) {
-				double[] quat = Quaternion.getQuat(inst.instance(i), angle_propagation[j][0]);
+				double[] quat = Quaternion.getQuat(inst.instance(i),
+						angle_propagation[j][0]);
 				for (int k = 1; k < angle_propagation[j].length; ++k) {
-					quat = Quaternion.quatMul(quat, Quaternion.getQuat(inst.instance(i), angle_propagation[j][k]));
+					quat = Quaternion.quatMul(quat, Quaternion.getQuat(
+							inst.instance(i), angle_propagation[j][k]));
 				}
-				//double[] vals = inst.instance(i).toDoubleArray();
-				//Instance new_inst = new Instance(1,vals);
-				//result.add(new_inst);
-				String name = angle_propagation[j][angle_propagation[j].length - 1] + "Prop";
+				// double[] vals = inst.instance(i).toDoubleArray();
+				// Instance new_inst = new Instance(1,vals);
+				// result.add(new_inst);
+				String name = angle_propagation[j][angle_propagation[j].length - 1]
+						+ "Prop";
 				Quaternion.insertQuat(inst, name);
 				Quaternion.setQuat(quat, result.instance(i), name);
 			}
@@ -57,8 +64,9 @@ public class PropagateFilter extends SimpleBatchFilter {
 	private static String[][] angle_propagation = {
 			{ "rotationLeftHip", "rotationLeftKnee", "rotationLeftAnkle" },
 			{ "rotationRightHip", "rotationRightKnee", "rotationRightAnkle" },
-			{ "rotationChest", "rotationLeftCollar", "rotationLeftShoulder","rotationLeftElbow", "rotationLeftWrist" },
-			{ "rotationChest", "rotationRightCollar", "rotationRightShoulder","rotationRightElbow", "rotationRightWrist" },
-			{ "rotationChest", "rotationNeck", "rotationHead" },
-	};
+			{ "rotationChest", "rotationLeftCollar", "rotationLeftShoulder",
+					"rotationLeftElbow", "rotationLeftWrist" },
+			{ "rotationChest", "rotationRightCollar", "rotationRightShoulder",
+					"rotationRightElbow", "rotationRightWrist" },
+			{ "rotationChest", "rotationNeck", "rotationHead" }, };
 }
