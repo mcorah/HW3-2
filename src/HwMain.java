@@ -25,6 +25,7 @@ public class HwMain {
 		// Options and java attributes
 		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
 		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
+		pathFile = "/home/andrew/affectiveComputing/HW3-2/postureData.arff";
 		int seed  = 4;		// chosen by fair dice roll, guaranteed to be random.
 		int folds = 10;		// number of folds in cross-validation
 		
@@ -38,8 +39,8 @@ public class HwMain {
 		
 		// Print the data set USING THE WEKA API THAT ALREADY DOES THE WORK
 		//  FOR YOU WHY WOULD YOU DO IT ANY OTHER WAY !?
-		System.out.println(data.toSummaryString());
-		System.out.print("\n");
+		//System.out.println(data.toSummaryString());
+		//System.out.print("\n");
 		
 		
 		//------Creating a classifier------//
@@ -92,7 +93,7 @@ public class HwMain {
 			System.out.print("what it thinks: ");
 			System.out.println(search.getCalculatedNumToSelect());
 			// generate new data
-			train = Filter.useFilter(train, selection);
+			//train = Filter.useFilter(train, selection);
 			
 			System.out.println("feature selection");
 			System.out.println(train.toSummaryString());
@@ -131,13 +132,18 @@ public class HwMain {
 		
 		filter = new QuaternionFilter();
 		filter.setInputFormat(new_data);
-		new_data = Filter.useFilter(new_data,  filter);
+		//new_data = Filter.useFilter(new_data,  filter);
 		
 		filter = new PropagateFilter();
 		filter.setInputFormat(new_data);
 		//new_data = Filter.useFilter(new_data,  filter);
 		
-
+		
+		DifferenceGenerator addDifferences = new DifferenceGenerator();
+		new_data = addDifferences.process(data);
+		
+		//67.6471
+		//new_data = data;
 		
 		System.out.println("num_instances");
 		System.out.println(new_data.numInstances());
