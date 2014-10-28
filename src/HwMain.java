@@ -1,5 +1,3 @@
-package src;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -21,12 +19,14 @@ import weka.classifiers.Evaluation;
 import weka.attributeSelection.*;
 import weka.filters.*;
 import weka.filters.supervised.attribute.AttributeSelection;
+import weka.filters.unsupervised.attribute.*;
+import weka.filters.supervised.attribute.*;
 
 public class HwMain {
 	public static void main(String[] args) throws Exception {
 		// Options and java attributes
-		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.txt";
-		pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
+		String pathFile = "/home/micah/courses/affective_computing/hw3-2/postureData.arff";
+		//pathFile = "/Users/theopak/Dropbox/classes/csci-4974_affective-computing/postureData.arff";
 		int seed = 4; // chosen by fair dice roll, guaranteed to be random.
 		int folds = 10; // number of folds in cross-validation
 
@@ -47,13 +47,16 @@ public class HwMain {
 		System.out.println("Classifying and validating using 10-fold CV\n");
 
 		// Classifier
-		String[] tmpOptions;
+		String[] tmpOptions = {};//{"-N", "100", "-M", "0.1", "-L", "0.2", "-B", "-H", "70,20,20,20,10"};
+		//String[] tmpOptions = {"-H", "70,20,20,20"};
 		String classname;
-		tmpOptions = Utils.splitOptions(Utils.getOption("W", args));
-		classname = "functions.MultilayerPerceptron";// tmpOptions[0];
-		// tmpOptions[0] = "";
-		Classifier cls = (Classifier) Utils.forName(Classifier.class,
-				"weka.classifiers." + classname, tmpOptions);
+		//classname      = "bayes.NaiveBayes";
+		classname      = "functions.MultilayerPerceptron";
+		//classname      = "meta.RandomCommittee";
+		//classname      = "functions.SMO";
+		//classname      = "trees.J48";
+		//classname      = "trees.RandomForest";
+		Classifier cls = (Classifier) Utils.forName(Classifier.class, "weka.classifiers." + classname, tmpOptions);
 
 		if (data.classIndex() == -1)
 			data.setClassIndex(data.numAttributes() - 1);
@@ -73,30 +76,25 @@ public class HwMain {
 			train = generateFeatures(train);
 			if (train.classIndex() == -1)
 				train.setClassIndex(train.numAttributes() - 1);
+			
 			test = generateFeatures(test);
 			if (test.classIndex() == -1)
 				test.setClassIndex(test.numAttributes() - 1);
 
 			AttributeSelection selection = new AttributeSelection();
-			// CfsSubsetEval subs = new CfsSubsetEval();
-			// FilteredSubsetEval subs = new FilteredSubsetEval();
-			GainRatioAttributeEval subs = new GainRatioAttributeEval();
-
-			// GreedyStepwise search = new GreedyStepwise();
-			// search.setSearchBackwards(true);
-			Ranker search = new Ranker();
-
-			search.setNumToSelect(50);
-
-			selection.setEvaluator(subs);
-			selection.setSearch(search);
-			selection.setInputFormat(train);
-			System.out.print("what it thinks: ");
-			System.out.println(search.getCalculatedNumToSelect());
-
-			System.out.println("feature selection");
-			System.out.println(Filter.useFilter(train, selection).toSummaryString());
-			System.out.print("\n");
+			CfsSubsetEval subs = new CfsSubsetEval();
+			//FilteredSubsetEval subs = new FilteredSubsetEval();
+			//ReliefFAttributeEval subs = new ReliefFAttributeEval();
+			
+			GreedyStepwise search = new GreedyStepwise();
+			search.setSearchBackwards(true);
+			//Ranker search = new Ranker();
+			
+			//search.setNumToSelect(0);
+			
+			//System.out.println("feature selection");
+			//System.out.println(Filter.useFilter(train, selection).toSummaryString());
+			//System.out.print("\n");
 			// the above code is used by the StratifiedRemoveFolds filter, the
 			// code below by the Explorer/Experimenter:
 			// Instances train = randData.trainCV(folds, n, rand);
@@ -133,12 +131,16 @@ public class HwMain {
 
 		filter = new QuaternionFilter();
 		filter.setInputFormat(new_data);
-		new_data = Filter.useFilter(new_data, filter);
-
+		//new_data = Filter.useFilter(new_data,  filter);
+		
 		filter = new PropagateFilter();
 		filter.setInputFormat(new_data);
-		// new_data = Filter.useFilter(new_data, filter);
-
+		//new_data = Filter.useFilter(new_data,  filter);
+		
+		Normalize norm = new Normalize();
+		norm.setInputFormat(new_data);
+		//new_data = Filter.useFilter(new_data, norm);
+		
 		System.out.println("num_instances");
 		System.out.println(new_data.numInstances());
 		return new_data;
